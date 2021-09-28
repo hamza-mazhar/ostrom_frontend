@@ -1,44 +1,40 @@
 import React             from "react";
-import logo              from './../assets/logo.png';
-import { ErrorBoundary } from 'react-error-boundary';
-import './error.css';
 
-class Error extends React.Component {
-  ErrorFallback = ({ resetErrorBoundary }) => {
-    return (
-      <div className="error-container">
-        <div className="error-holder-container">
-          <div className="error-logo-holder">
-            <img src={ logo } alt="Logo" className="error-logo"/>
+interface Props {
+  children: any;
+}
+
+interface State {
+  hasError: boolean;
+  error:any;
+  info:any;
+}
+export default class ErrorBoundary extends React.Component<Props,State> {
+  constructor(props:any ) {
+    super(props);
+    this.state = { hasError: false, error: '', info:  '' };
+  }
+
+  componentDidCatch(error: any, info: any): void {
+    this.setState({ hasError: true, error: error, info: info });
+  }
+
+  render(): {} {
+    if (this.state.hasError) {
+      return (
+          <div id="errorModal" className="modal">
+            <div className="modal-content">
+              <span className="close">&times;</span>
+              <h2>Application Crash</h2>
+              <p>Error encountered in application.</p>
+              {this.state.error}
+            </div>
           </div>
-          <h4 className="error-caption">Sorry, something went wrong.</h4>
-          <p className="error-description">
-            We are working on it and we will get it fixed as soon as we can
-          </p>
-          <span href="#" className="error-go-back-btn" onClick={ () => {
-            resetErrorBoundary();
-            window.location.reload();
-          } }>Go Back</span>
-        </div>
-      </div>
-    )
-  }
+      );
+    }
 
-  myErrorHandler = (error, componentStack) => {
-    console.log(error, componentStack);
-  }
-
-  render() {
-    const { children } = this.props;
-    return (
-      <ErrorBoundary
-        FallbackComponent={ this.ErrorFallback }
-        onError={ this.myErrorHandler }
-      >
-        { children }
-      </ErrorBoundary>
-    )
+    // Render children if no error
+    return this.props.children
   }
 }
 
-export default Error
